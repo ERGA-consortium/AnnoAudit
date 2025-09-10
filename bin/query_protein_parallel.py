@@ -1,3 +1,4 @@
+import os 
 import argparse
 import asyncio
 import aiohttp
@@ -6,6 +7,10 @@ from io import StringIO, BytesIO
 import json
 import hashlib
 import math
+
+cache_dir = os.path.join(os.getenv('TMPDIR', '/tmp'), 'biopython_cache')
+os.makedirs(cache_dir, exist_ok=True)
+Entrez.local_cache = cache_dir
 
 def calculate_bloom_filter_size(n: int, p: float, k: int) -> int:
     if p <= 0 or p >= 1:

@@ -4,7 +4,8 @@ process COMBINE_REPORT {
 
     input:
     path(ch_statistics_out)
-    path(ch_busco_out)
+    path(ch_busco_annot_out)
+    path(ch_busco_assem_out)
     path(ch_omark_out)
     path(ch_brh_out)
     path(ch_distribution_out)
@@ -12,6 +13,7 @@ process COMBINE_REPORT {
     path(ch_feature_stats)
     path(ch_psauron_stats)
     path(ch_intron_stats)
+    path(ch_taxon_info)
     
     output:
     path("Evaluation_output.json"), emit: statistics_json
@@ -20,8 +22,9 @@ process COMBINE_REPORT {
     script:
     """
     python3 ${projectDir}/bin/combine_report.py --statistics_output ${ch_statistics_out} \\
-    --busco_output ${ch_busco_out} --omark_output ${ch_omark_out} \\
+    --busco_annot_output ${ch_busco_annot_out} --busco_assem_out ${ch_busco_assem_out} --omark_output ${ch_omark_out} \\
     --brh_output ${ch_brh_out} --idxstats_output ${ch_index_stats} --compare_distribution_output ${ch_distribution_out} \\
-    --feature_output ${ch_feature_stats} --psauron_output ${ch_psauron_stats} --intron_output ${ch_intron_stats}
+    --feature_output ${ch_feature_stats} --psauron_output ${ch_psauron_stats} --intron_output ${ch_intron_stats} --taxon_info ${ch_taxon_info} \\
+    --reference_warning ${projectDir}/assets/warning_thresholds.json
     """
 }

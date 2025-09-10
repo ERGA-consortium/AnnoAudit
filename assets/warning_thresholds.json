@@ -1,0 +1,17 @@
+{
+    "num_genes": 40000,
+    "num_transcripts_without_introns": 25.00,
+    "median_cds_length": 700,
+    "num_split_gene_length_<0.75x": 10.00,
+    "num_fusion_gene_length_>1.25x": 10.00,
+    "psauron_score": 90,
+    "busco_annot": 90.00,
+    "delta_busco": 5.00,
+    "total_contaminants": 1.00,
+    "short_intron_3n": 34,
+    "stopless_short_intron_3n": 30,
+    "mapping_rate": 90.00,
+    "num_gene_supported": 75.00,
+    "num_exon_supported": 75.00,
+    "num_intron_supported": 75.00
+}

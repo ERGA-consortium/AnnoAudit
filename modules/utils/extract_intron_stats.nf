@@ -9,9 +9,8 @@ process EXTRACT_INTRON_STATS {
     
     output:
     path("statistics.tsv"), emit: statistics
-    path("short_with_stop.pickle"), emit: short_with_stop
-    path("short_without_stop.pickle"), emit: short_without_stop
-
+    path("intron_plot_data.pkl"), emit: plot_data
+    
     script:
     """
     python3 ${projectDir}/bin/extract_intron_stats.py ${ch_fasta} ${genetic_code}
