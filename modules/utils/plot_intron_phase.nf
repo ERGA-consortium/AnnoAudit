@@ -3,17 +3,14 @@ process PLOT_INTRON_PHASE {
     label 'seaborn'
 
     input:
-    path(short_with_stop)
-    path(short_without_stop)
+    path(plot_data)
     
     output:
-    path("Short_intron_with_stop_distribution.pdf")
-    path("Short_intron_with_stop_distribution.png"), emit: short_with_stop_png
-    path("Short_intron_without_stop_distribution.pdf")
-    path("Short_intron_without_stop_distribution.png"), emit: short_without_stop_png
+    path('intron_distributions.pdf'), emit: intron_plot_pdf
+    path('intron_distributions.png'), emit: intron_plot_png
 
     script:
     """
-    python3 ${projectDir}/bin/plot_intron_phase.py --short_with_stop ${short_with_stop} --short_without_stop ${short_without_stop}
+    python3 ${projectDir}/bin/plot_intron_phase.py --input_pkl ${plot_data}
     """
 }

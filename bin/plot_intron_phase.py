@@ -1,39 +1,69 @@
 import argparse
 import pickle
+import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 
-def plot_distribution(seq_lengths, image_prefix):
-    # Prepare the plot
-    plt.figure(figsize=(12, 6))
+def plot_distribution(data, title, ax, max_length=500):
+    mod_classes = [0, 1, 2]
+    colors = ['#0f0f0f', '#ff7f0e', '#2ca02c']
+    labels = ['3n', '3n+1', '3n+2']
     
-    # Plot the histograms for each phase
-    for phase, lengths in seq_lengths.items():
-        sns.histplot(lengths, kde=True, bins=100, label=phase, fill=False)
+    all_lengths = []
+    for mc in mod_classes:
+        all_lengths.extend(data[mc])
     
-    plt.xlabel('Intron Length')
-    plt.ylabel('Number of Sequences')
-    plt.title('Intron Length Distribution by Phase')
-    plt.legend(title='Phase')
-    plt.xlim(40, 121)
+    if not all_lengths:
+        ax.set_title(f"{title}\n(No data)")
+        return
     
-    # Save the plot as PDF and PNG
-    plt.savefig(image_prefix + '.pdf')
-    plt.savefig(image_prefix + '.png')
+    bins = np.arange(0, min(max(all_lengths), max_length) + 1, 10)
+    
+    for mc, color, label in zip(mod_classes, colors, labels):
+        lengths = data[mc]
+        if not lengths:
+            continue
+        counts, _ = np.histogram(lengths, bins=bins)
+        bin_centers = (bins[:-1] + bins[1:]) / 2
+        ax.plot(bin_centers, counts, label=label, 
+                color=color, linewidth=2, marker='o', markersize=4)
+    
+    ax.set_title(title, fontsize=12)
+    ax.set_xlabel('Intron Length (nt)', fontsize=10)
+    ax.set_ylabel('Count', fontsize=10)
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(0, max_length)
 
-def main(short_with_stop, short_without_stop):
-    with open(short_with_stop, 'rb') as handle:
-        short_with_stop = pickle.load(handle)
-    with open(short_without_stop, 'rb') as handle:
-        short_without_stop = pickle.load(handle)
-
-    plot_distribution(short_with_stop, "Short_intron_with_stop_distribution")
-    plot_distribution(short_without_stop, "Short_intron_without_stop_distribution")
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Plot the sequence length distribution from two pickle files categorized by phase.')
-    parser.add_argument("-a", '--short_with_stop', type=str, help='Path to the input pickle file.')
-    parser.add_argument("-b", "--short_without_stop",  type=str, help='Path to the input pickle file.')
-
+def main():
+    parser = argparse.ArgumentParser(description='Plot intron length distributions')
+    parser.add_argument('--input_pkl', help='Pickle file from extract_intron_stats.py')
+    parser.add_argument('--max_length', type=int, default=150,
+                        help='Maximum length to display (default: 150)')
     args = parser.parse_args()
-    main(args.short_with_stop, args.short_without_stop)
+
+    # Load precomputed data
+    with open(args.input_pkl, 'rb') as pkl_file:
+        plot_data = pickle.load(pkl_file)
+    
+    # Create plots
+    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+    plot_distribution(
+        plot_data['without_stop'], 
+        "Introns Without Stop Codons", 
+        axs[0], 
+        args.max_length
+    )
+    plot_distribution(
+        plot_data['with_stop'], 
+        "Introns Containing Stop Codons", 
+        axs[1], 
+        args.max_length
+    )
+    
+    plt.tight_layout()
+    plt.savefig('intron_distributions.pdf')
+    plt.savefig('intron_distributions.png', dpi=300)
+    plt.close()
+
+if __name__ == '__main__':
+    main()

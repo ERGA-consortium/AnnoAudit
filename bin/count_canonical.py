@@ -22,7 +22,7 @@ def calculate_splice_stats(input_file, output_file):
     
     # Write results to file
     with open(output_file, 'w') as out:
-        out.write(f"num_intron_supported\t{total}\n")
+        out.write(f"num_exact_intron_boundary\t{total}\n")
         out.write(f"num_intron_supported_canonical\t{canonical_count} ({canonical_percent:.2f}%)\n")
         out.write(f"num_intron_supported_non_canonical\t{non_canonical_count} ({non_canonical_percent:.2f}%)\n")
 

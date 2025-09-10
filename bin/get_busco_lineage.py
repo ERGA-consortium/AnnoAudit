@@ -1,3 +1,4 @@
+import os
 import csv
 import argparse
 from Bio import Entrez
@@ -8,9 +9,12 @@ def load_busco_lineages(busco_database):
         return {row[0].strip() for row in reader}
 
 def get_taxonomy(taxon_id, query_email):
+    cache_dir = os.path.join(os.getenv('TMPDIR', '/tmp'), 'biopython_cache')
+    os.makedirs(cache_dir, exist_ok=True)
+    Entrez.local_cache = cache_dir
     Entrez.email = query_email 
     handle = Entrez.efetch(db="taxonomy", id=taxon_id, retmode="xml")
-    records = Entrez.read(handle)
+    records = Entrez.read(handle, validate=False)
     handle.close()
     lineage = records[0]["Lineage"].split("; ")
     return lineage

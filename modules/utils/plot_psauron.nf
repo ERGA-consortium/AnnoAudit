@@ -4,6 +4,7 @@ process PLOT_PSAURON {
 
     input:
     path(ch_psauron_out)
+    path(ch_predicted_proteome)
     
     output:
     path("PSAURON_plot.pdf"), emit: psauron_pdf
@@ -11,6 +12,6 @@ process PLOT_PSAURON {
 
     script:
     """
-    python3 ${projectDir}/bin/plot_psauron.py --input ${ch_psauron_out}
+    python3 ${projectDir}/bin/plot_psauron.py --input ${ch_psauron_out} --fasta ${ch_predicted_proteome}
     """
 }

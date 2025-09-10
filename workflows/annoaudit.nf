@@ -57,12 +57,16 @@ if (!params.ref_protein && params.query_ncbi_prot) {
 */
 
 // MODULES
+include { GET_TAXON_INFO         } from '../modules/utils/get_taxon_info.nf'
+include { GET_ANNOTATION         } from '../modules/phylocontext/get_annotation.nf'
 include { FILTER_LONGEST_GFF     } from '../modules/utils/filter_longest_isoforms.nf'
 include { CALCULATE_STATISTICS   } from '../modules/utils/calculate_statistics.nf'
 include { EXTRACT_INTRON_STATS   } from '../modules/utils/extract_intron_stats.nf'
 include { PLOT_INTRON_PHASE      } from '../modules/utils/plot_intron_phase.nf'
 include { GET_BUSCO_LINEAGE      } from '../modules/utils/get_busco_lineage.nf'
-include { BUSCO                  } from '../modules/busco/busco.nf'
+include { BUSCO_ANNOT            } from '../modules/busco/busco_annot.nf'
+include { BUSCO_ASSEM            } from '../modules/busco/busco_assem.nf'
+include { BUSCO_PLOT             } from '../modules/busco/busco_plot.nf'
 include { PSAURON                } from '../modules/psauron/psauron.nf'
 include { PLOT_PSAURON           } from '../modules/utils/plot_psauron.nf'
 include { DOWNLOAD_OMA           } from '../modules/utils/download_oma.nf'
@@ -91,9 +95,22 @@ include { CALCULATE_INTRON_STATS } from '../subworkflows/calculate_intron_stats.
 
 workflow ANNOAUDIT {
 
-    // Filter for longest isoforms
-    FILTER_LONGEST_GFF ( ch_gff )
-    ch_filtered_gff = FILTER_LONGEST_GFF.out.filtered_gff
+    if (params.ncbi_query_email && params.taxon_id) {
+        GET_TAXON_INFO ( params.ncbi_query_email, params.taxon_id )
+        ch_taxon_info = GET_TAXON_INFO.out.taxon_info
+    }
+
+    //if (params.taxon_id) {
+    //    GET_ANNOTATION ( params.taxon_id )
+    //    ch_phylocontext = GET_ANNOTATION.out.phylocontext_out
+    //}
+
+    if (params.filter_isoforms) {
+        FILTER_LONGEST_GFF ( ch_gff )
+        ch_filtered_gff = FILTER_LONGEST_GFF.out.filtered_gff
+    } else {
+        ch_filtered_gff = ch_gff
+    }
     
     if (params.protein) {
         ch_protein = Channel.fromPath("${params.protein}", checkIfExists: true)
@@ -106,13 +123,15 @@ workflow ANNOAUDIT {
     CALCULATE_STATISTICS ( ch_genome, ch_filtered_gff, params.cds_only )
     ch_statistics_out = CALCULATE_STATISTICS.out.statistics
     ch_intron_fasta = CALCULATE_STATISTICS.out.intron_fasta
+    ch_intron_bed = CALCULATE_STATISTICS.out.intron_bed
+    ch_longest_isoform_introns = CALCULATE_STATISTICS.out.longest_isoform_introns
 
     EXTRACT_INTRON_STATS ( ch_intron_fasta, params.genetic_code, ch_statistics_out )
     ch_all_statistics = EXTRACT_INTRON_STATS.out.statistics
-    ch_short_with_stop = EXTRACT_INTRON_STATS.out.short_with_stop
-    ch_short_without_stop = EXTRACT_INTRON_STATS.out.short_without_stop
+    ch_plot_data = EXTRACT_INTRON_STATS.out.plot_data
 
-    PLOT_INTRON_PHASE ( ch_short_with_stop, ch_short_without_stop )
+    PLOT_INTRON_PHASE ( ch_plot_data )
+    ch_intron_plot = PLOT_INTRON_PHASE.out.intron_plot_png
 
     // Ortholog analysis
     if (params.lineage) {
@@ -124,9 +143,16 @@ workflow ANNOAUDIT {
         ch_busco_lineage = null
     }
 
-    BUSCO ( ch_protein, ch_busco_lineage )
-    ch_busco_short = BUSCO.out.results
-    ch_busco_plot = BUSCO.out.plot
+    BUSCO_ANNOT ( ch_protein, ch_busco_lineage )
+    ch_busco_short_annot = BUSCO_ANNOT.out.results
+    ch_busco_annot_txt = BUSCO_ANNOT.out.results_txt
+
+    BUSCO_ASSEM ( ch_genome, ch_busco_lineage )
+    ch_busco_short_assem = BUSCO_ASSEM.out.results
+    ch_busco_assem_txt = BUSCO_ASSEM.out.results_txt
+
+    BUSCO_PLOT ( ch_busco_annot_txt, ch_busco_assem_txt )
+    ch_busco_plot = BUSCO_PLOT.out.busco_plot
 
     // Check database then run OMARK
     if (params.oma_database) {
@@ -148,11 +174,10 @@ workflow ANNOAUDIT {
     PSAURON (ch_protein) 
     ch_psauron_out = PSAURON.out.psauron_out
 
-    PLOT_PSAURON (ch_psauron_out)
+    PLOT_PSAURON (ch_psauron_out, ch_protein)
     ch_psauron_plot = PLOT_PSAURON.out.psauron_png
 
     // Protein analysis
-
     if (params.ref_protein) {
         ch_reference_proteome = Channel.fromPath("${params.ref_protein}", checkIfExists: true)
     } else if (params.query_ncbi_prot) {
@@ -191,13 +216,13 @@ workflow ANNOAUDIT {
     featureCounts_stats = FEATURECOUNTS.out.gene_count
 
     // Calculate intron_stats
-    CALCULATE_INTRON_STATS ( ch_genome, ch_genome_bam, annotation_gtf )
+    CALCULATE_INTRON_STATS ( ch_genome, ch_genome_bam, annotation_gtf, ch_intron_bed, ch_longest_isoform_introns )
     ch_canonical_stats = CALCULATE_INTRON_STATS.out.ch_canonical_stats
 
     // Combined information
-    COMBINE_REPORT ( ch_all_statistics, ch_busco_short, ch_omark_out, ch_brh_out, ch_compare_distribution_out, ch_genome_stat, featureCounts_stats, ch_psauron_out, ch_canonical_stats )
+    COMBINE_REPORT ( ch_all_statistics, ch_busco_short_annot, ch_busco_short_assem, ch_omark_out, ch_brh_out, ch_compare_distribution_out, ch_genome_stat, featureCounts_stats, ch_psauron_out, ch_canonical_stats, ch_taxon_info )
     ch_statistis_json = COMBINE_REPORT.out.statistics_json
 
     // Generate PDF
-    GENERATE_PDF ( ch_statistis_json, ch_busco_plot, ch_omark_plot, ch_psauron_plot, ch_length_plot, ch_ditribution_plot, PLOT_INTRON_PHASE.out.short_with_stop_png, PLOT_INTRON_PHASE.out.short_without_stop_png )
+    GENERATE_PDF ( ch_statistis_json, ch_busco_plot, ch_omark_plot, ch_psauron_plot, ch_length_plot, ch_ditribution_plot, ch_intron_plot )
 }
