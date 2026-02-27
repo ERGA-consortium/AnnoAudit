@@ -110,9 +110,9 @@ def __main__() :
     args = parser.parse_args()
 
     # open gff input file
-    if args.gff_file != sys.stdin : # file
+    if args.gff_file != sys.stdin:  # file
         fileIn = open(args.gff_file, 'r')
-    else : # STDIN
+    else:  # STDIN
         fileIn = args.gff_file
 
     # open faidx file
@@ -138,19 +138,23 @@ def __main__() :
     else : # STDOUT
         fileOut = args.out_file
 
-    # read gff input file
     current_id = ''
     struct_to_extract = list()
-    gff_line = fileIn.readline().strip()
-    while len(gff_line) > 1:
-        gff_line = gff_line.split('\t')
-        while "#" in gff_line[0]: # delete comment lines
-            gff_line = fileIn.readline().strip().split("\t")
- 
-        record = GFF_line(*gff_line)
+    for line in fileIn:
+        line = line.strip()
         
-        if record.get_feature() != args.type_to_print: # next line if the type is not the choosen one (--type)
-            gff_line = fileIn.readline().strip() # read new gff line
+        # Skip empty lines and comment lines
+        if not line or line.startswith('#'):
+            continue
+        fields = line.split('\t')
+        
+        # Skip lines that don't have exactly 9 fields
+        if len(fields) != 9:
+            continue
+            
+        record = GFF_line(*fields)
+        
+        if record.get_feature() != args.type_to_print:  # next line if the type is not the chosen one (--type)
             continue
 
         # select id
@@ -163,24 +167,21 @@ def __main__() :
         if args.concat_line:
             # si nouveau id, alors print seq, flush de la stuct et mettre a jour id
             if current_id != name:
-                printseq(fileOut, current_id, struct_to_extract, record_dict, args.to_translate, args.genetic_code) # dans la fonction, tester si la structure est vide ou non
+                printseq(fileOut, current_id, struct_to_extract, record_dict, args.to_translate, args.genetic_code)
                 struct_to_extract = list()
                 current_id = name
             struct_to_extract.append(record)
  
         else:
             struct_to_extract.append(record)
-            printseq(fileOut, name, struct_to_extract, record_dict, args.to_translate, args.genetic_code) # dans la fonction, tester si la structure est vide ou non
+            printseq(fileOut, name, struct_to_extract, record_dict, args.to_translate, args.genetic_code)
             struct_to_extract = list()
-
-        gff_line = fileIn.readline().strip() # read gff new line
     
     if args.concat_line:
         printseq(fileOut, current_id, struct_to_extract, record_dict, args.to_translate, args.genetic_code)
 
     fileOut.close()
     fileIn.close()
-    #seqbk.close()
     record_dict.close()
 
 __main__()

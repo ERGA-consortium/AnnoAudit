@@ -11,6 +11,6 @@ process BUSCO_PLOT {
 
     script:
     """
-    generate_plot.py -wd .
+    busco --plot .
     """
 }

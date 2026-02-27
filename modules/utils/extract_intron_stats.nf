@@ -8,12 +8,12 @@ process EXTRACT_INTRON_STATS {
     path(general_stats)
     
     output:
-    path("statistics.tsv"), emit: statistics
+    path("all_statistics.tsv"), emit: statistics
     path("intron_plot_data.pkl"), emit: plot_data
     
     script:
     """
     python3 ${projectDir}/bin/extract_intron_stats.py ${ch_fasta} ${genetic_code}
-    cat stop_codon_statistics.tsv >> statistics.tsv
+    cat statistics.tsv stop_codon_statistics.tsv >> all_statistics.tsv
     """
 }

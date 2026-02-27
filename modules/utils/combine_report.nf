@@ -14,6 +14,7 @@ process COMBINE_REPORT {
     path(ch_psauron_stats)
     path(ch_intron_stats)
     path(ch_taxon_info)
+    val(tolid)
     
     output:
     path("Evaluation_output.json"), emit: statistics_json
@@ -25,6 +26,6 @@ process COMBINE_REPORT {
     --busco_annot_output ${ch_busco_annot_out} --busco_assem_out ${ch_busco_assem_out} --omark_output ${ch_omark_out} \\
     --brh_output ${ch_brh_out} --idxstats_output ${ch_index_stats} --compare_distribution_output ${ch_distribution_out} \\
     --feature_output ${ch_feature_stats} --psauron_output ${ch_psauron_stats} --intron_output ${ch_intron_stats} --taxon_info ${ch_taxon_info} \\
-    --reference_warning ${projectDir}/assets/warning_thresholds.json
+    --reference_warning ${projectDir}/assets/warning_thresholds.json --tolid ${tolid}
     """
 }

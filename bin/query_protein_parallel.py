@@ -129,6 +129,7 @@ async def fetch_protein_sequences(email, taxon_id, target_count=100000, batch_si
                 for chunk in id_chunks:
                     if len(chunk_tasks) >= max_concurrent_requests:
                         results = await asyncio.gather(*chunk_tasks)
+                        await asyncio.sleep(0.5)
                         for fetch_results in results:
                             if fetch_results:
                                 sequences_batch = list(SeqIO.parse(StringIO(fetch_results), "fasta"))
