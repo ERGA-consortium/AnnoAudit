@@ -18,8 +18,28 @@ def parse_gff(gff_file):
 
 def convert_gff_to_gtf(gff_df):
     gtf_lines = []
-    transcript_to_gene = {}  
+    transcript_to_gene = {}
     
+    # First pass: build transcript to gene mapping
+    for _, row in gff_df.iterrows():
+        attr_dict = parse_attributes(row['attribute'])
+        feature = row['feature']
+        
+        if feature in ['mRNA', 'transcript']:
+            transcript_id = attr_dict.get('ID', '')
+            gene_id = attr_dict.get('Parent', '')
+            
+            # Sometimes Parent might not be set, check gene attribute
+            if not gene_id:
+                gene_id = attr_dict.get('gene', '')
+                if gene_id:
+                    # Format gene_id properly
+                    gene_id = f'gene-{gene_id}' if not gene_id.startswith('gene-') else gene_id
+            
+            if transcript_id and gene_id:
+                transcript_to_gene[transcript_id] = gene_id
+    
+    # Second pass: generate GTF lines
     for _, row in gff_df.iterrows():
         attr_dict = parse_attributes(row['attribute'])
         feature = row['feature']
@@ -27,11 +47,17 @@ def convert_gff_to_gtf(gff_df):
         if feature == 'gene':
             continue
             
-        elif feature == 'mRNA':
+        elif feature in ['mRNA', 'transcript']:
             transcript_id = attr_dict.get('ID', '')
-            gene_id = attr_dict.get('Parent', '')
-            if transcript_id and gene_id:
-                transcript_to_gene[transcript_id] = gene_id
+            gene_id = transcript_to_gene.get(transcript_id, '')
+            
+            if not gene_id:
+                gene_id = attr_dict.get('gene', '')
+                if gene_id:
+                    gene_id = f'gene-{gene_id}' if not gene_id.startswith('gene-') else gene_id
+            
+            if not (transcript_id and gene_id):
+                continue
             
             attributes = [
                 f'gene_id "{gene_id}"',
@@ -49,9 +75,25 @@ def convert_gff_to_gtf(gff_df):
             parent_transcript = attr_dict.get('Parent', '')
             gene_id = transcript_to_gene.get(parent_transcript, '')
             
-            attributes = []
-            if gene_id:
-                attributes.append(f'gene_id "{gene_id}"')
+            # If we can't find gene_id from transcript, try other methods
+            if not gene_id:
+                # Try from gene attribute
+                gene_id = attr_dict.get('gene', '')
+                if gene_id:
+                    gene_id = f'gene-{gene_id}' if not gene_id.startswith('gene-') else gene_id
+                # Try from transcript_to_gene using different transcript ID formats
+                elif parent_transcript:
+                    # Check if parent_transcript is in dictionary
+                    for key in transcript_to_gene:
+                        if key in parent_transcript or parent_transcript in key:
+                            gene_id = transcript_to_gene[key]
+                            break
+            
+            if not gene_id:
+                # Skip if we can't find gene_id
+                continue
+            
+            attributes = [f'gene_id "{gene_id}"']
             
             if feature == 'exon':
                 exon_id = attr_dict.get('exon_id', attr_dict.get('ID', ''))

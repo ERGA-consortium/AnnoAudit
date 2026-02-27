@@ -1,5 +1,6 @@
 import statistics
 import argparse
+import datetime
 import json
 import csv
 import re
@@ -167,6 +168,9 @@ def combine_results(statistics, busco, omark, brh, prot_distribution, transcript
     protein_combined = {**brh, **prot_distribution}
     rnaseq_combined = {**transcriptome, **featurecount, **intron_info}
 
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
+    
+
     with open("Evaluation_output.txt", "w") as f_out:
         
         max_key_length = max(len(str(key)) for key in combined_stats)
@@ -257,6 +261,7 @@ def main():
     parser.add_argument("-k", "--intron_output", help="Path to the output of intron analysis")
     parser.add_argument("-t", "--taxon_info", help="Path to the taxon information")
     parser.add_argument("-w", "--reference_warning", help="Threshold for warning comparison")
+    parser.add_argument("--tolid", help="TOLID of the genome")
     args = parser.parse_args()
 
     statistics_out = parse_statistics_output(args.statistics_output)
@@ -271,6 +276,8 @@ def main():
     intron_out = parse_feature(args.intron_output)
     taxon_info = parse_feature(args.taxon_info)
     ref_warning = parse_json(args.reference_warning)
+
+    taxon_info["ToLID"] = args.tolid
 
     delta_busco_value = round(float(busco_annot_complete) - float(busco_assem_complete),2)
     delta_busco = {"Delta BUSCO": str(delta_busco_value) + "%"}

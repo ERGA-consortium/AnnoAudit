@@ -23,6 +23,7 @@ def get_taxon_info(taxon_id):
     taxon_info = {
         'TxID': taxon_id,
         'Species': record.get('ScientificName', 'N/A'),
+        'Phylum': 'N/A',
         'Class': 'N/A',
         'Order': 'N/A'
     }
@@ -30,7 +31,9 @@ def get_taxon_info(taxon_id):
     lineage = record.get('LineageEx', [])
 
     for entry in lineage:
-        if entry['Rank'] == 'class':
+        if entry['Rank'] == 'phylum':
+            taxon_info['Phylum'] = entry.get('ScientificName', 'N/A')
+        elif entry['Rank'] == 'class':
             taxon_info['Class'] = entry.get('ScientificName', 'N/A')
         elif entry['Rank'] == 'order':
             taxon_info['Order'] = entry.get('ScientificName', 'N/A')
@@ -51,6 +54,7 @@ if __name__ == "__main__":
         if result:
             f.write(f"TxID\t{result['TxID']}\n")
             f.write(f"Species\t{result['Species']}\n")
+            f.write(f"Phylum\t{result['Phylum']}\n")
             f.write(f"Class\t{result['Class']}\n")
             f.write(f"Order\t{result['Order']}\n")
         else:

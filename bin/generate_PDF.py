@@ -109,7 +109,7 @@ def create_report(json_data, output_file, image_paths=None):
     )
     
     story = []
-    title = Paragraph("Genome Analysis Report", styles['Title'])
+    title = Paragraph("Genome Annotation Report", styles['Title'])
     story.append(title)
     story.append(Spacer(1, 30))
     

@@ -11,7 +11,7 @@ process BEDTOOLS_INTERSECT {
 
 	script:
 	"""
-    bedtools intersect -a ${intron_bed} -b ${splice_junction_bed} -wa -wb > supported_introns.bed
+    bedtools intersect -a ${intron_bed} -b ${splice_junction_bed} -f 1.0 -r -wa -wb > supported_introns.bed
 	awk 'BEGIN {FS="\\t"; OFS="\\t"} {count[\$1 FS \$2 FS \$3]++} END {for (key in count) if (count[key] > 1) print key, count[key]}' supported_introns.bed > filtered_supported_introns.bed
 	"""
 }

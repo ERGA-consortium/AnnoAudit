@@ -151,7 +151,7 @@ workflow ANNOAUDIT {
     ch_busco_short_assem = BUSCO_ASSEM.out.results
     ch_busco_assem_txt = BUSCO_ASSEM.out.results_txt
 
-    BUSCO_PLOT ( ch_busco_annot_txt, ch_busco_assem_txt )
+    BUSCO_PLOT ( ch_busco_short_annot, ch_busco_short_assem )
     ch_busco_plot = BUSCO_PLOT.out.busco_plot
 
     // Check database then run OMARK
@@ -220,7 +220,7 @@ workflow ANNOAUDIT {
     ch_canonical_stats = CALCULATE_INTRON_STATS.out.ch_canonical_stats
 
     // Combined information
-    COMBINE_REPORT ( ch_all_statistics, ch_busco_short_annot, ch_busco_short_assem, ch_omark_out, ch_brh_out, ch_compare_distribution_out, ch_genome_stat, featureCounts_stats, ch_psauron_out, ch_canonical_stats, ch_taxon_info )
+    COMBINE_REPORT ( ch_all_statistics, ch_busco_short_annot, ch_busco_short_assem, ch_omark_out, ch_brh_out, ch_compare_distribution_out, ch_genome_stat, featureCounts_stats, ch_psauron_out, ch_canonical_stats, ch_taxon_info, params.tolid)
     ch_statistis_json = COMBINE_REPORT.out.statistics_json
 
     // Generate PDF

@@ -60,7 +60,7 @@ The following programs are required to run the workflow and the listed version w
 Simply get the code from github or workflowhub and directly use it for the analysis with `nextflow`.
 
 ```
-git clone https://github.com/ERGA-consortium/pipelines
+git clone https://github.com/ERGA-consortium/AnnoAudit
 ```
 
 ## Running AnnoAudit

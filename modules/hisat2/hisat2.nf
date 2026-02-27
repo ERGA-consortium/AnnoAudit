@@ -1,6 +1,8 @@
 process HISAT2 {
     label 'hisat2'
     label 'process_high'
+    label 'process_high_memory'
+    label 'process_high_cpus'
     tag "$meta.sample"
 
     input:
