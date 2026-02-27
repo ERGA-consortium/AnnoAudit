@@ -2,6 +2,21 @@
 
 AnnoAudit is a robust Nextflow pipeline designed to evaluate the quality of genomic annotations through a multifaceted approach.
 
+## Table of Contents
+- [Overview](#overview-of-the-workflow)
+- [Input Data](#input-data)
+- [Pipeline Steps](#pipeline-steps)
+- [Output Data](#output-data)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running AnnoAudit](#running-annoaudit)
+  - [Before Running (Important)](#before-running-the-pipeline-important)
+  - [How to Run](#how-to-run-the-code)
+  - [Parameters](#other-parameters-for-running-the-analysis)
+- [Example Output](#example-output)
+- [Comparing Multiple Runs](#comparing-the-output-from-multiple-runs)
+- [Future Work](#future-work)
+
 ## Overview of the workflow
 
 The workflow assess the annotation quality based on different criteria:
