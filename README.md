@@ -98,6 +98,7 @@ Input parameter:
 --genome_bam              BAM file contain the mapped information from the RNASeq to the genome FASTA.
 --rnaseq                  A metadata CSV file following the pattern: sample_id,R1_path,R2_path,read_type. Required if `genome_bam` is not provided.
 --taxon_id                Taxon ID for identifying BUSCO lineage and download protein data from NCBI if needed.
+--tolid                   TOLID (or an identifier string for the species).
 --ncbi_query_email        Email for querying protein from NCBI database.
 
 Optional input:
@@ -150,112 +151,129 @@ Per default: -profile slurm,singularity is executed.
 ## Example output
 
 Below is the sample output of this workflow. The example PDF output is located in `assest` folder.
+[Example PDF](assets/AnnoAudit_Report.pdf)
 
 ```
-|General Statistics                 | Value           |
--------------------------------------------------------
-|num_genes                          | 36391           |
-|num_genes_without_introns          | 12968 (35.64%)  |
-|mean_gene_length                   | 2359.57         |
-|median_gene_length                 | 1562.0          |
-|num_exons                          | 149725          |
-|mean_exons_per_gene                | 4.11            |
-|median_exons_per_gene              | 2.0             |
-|num_exon_3n                        | 76783 (51.28%)  |
-|num_exon_3n1                       | 36932 (24.67%)  |
-|num_exon_3n2                       | 36010 (24.05%)  |
-|mean_cds_length                    | 1091.4          |
-|median_cds_length                  | 873.0           |
-|total_cds_length                   | 39717145        |
-|percentage_cds_coverage            | 10.64%          |
-|num_introns                        | 113334          |
-|mean_intron_length                 | 407.2           |
-|median_intron_length               | 149.0           |
-|short_intron_<120_3n0_without_stop | 4324 (3.82)%    |
-|long_intron_>120_3n0_without_stop  | 1185 (1.05)%    |
-|short_intron_<120_3n1_without_stop | 4205 (3.71)%    |
-|long_intron_>120_3n1_without_stop  | 1291 (1.14)%    |
-|short_intron_<120_3n2_without_stop | 4319 (3.81)%    |
-|long_intron_>120_3n2_without_stop  | 1249 (1.10)%    |
-|short_intron_<120_3n0_with_stop    | 12073 (10.65)%  |
-|long_intron_>120_3n0_with_stop     | 20332 (17.94)%  |
-|short_intron_<120_3n1_with_stop    | 11652 (10.28)%  |
-|long_intron_>120_3n1_with_stop     | 20486 (18.08)%  |
-|short_intron_<120_3n2_with_stop    | 11733 (10.35)%  |
-|long_intron_>120_3n2_with_stop     | 20485 (18.07)%  |
-
-|BUSCO                              | Value           |
--------------------------------------------------------
-|lineage_dataset                    | poales_odb10    |
-|complete                           | 97.6%           |
-|single_copy                        | 95.8%           |
-|multi_copy                         | 1.8%            |
-|fragmented                         | 0.2%            |
-|missing                            | 2.2%            |
-|num_markers                        | 4896            |
-|domain                             | eukaryota       |
+|Taxon Info                                               | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|TxID                                                     | 105859                                  |
+|Species                                                  | Antedon mediterranea                    |
+|Phylum                                                   | Echinodermata                           |
+|Class                                                    | Crinoidea                               |
+|Order                                                    | Comatulida                              |
+|ToLID                                                    | ecAntMedi1.1_ncbi                       |
 
 
-|OMARK                              | Value           |
--------------------------------------------------------
-|OMA_clade                          | Oryza           |
-|num_conserved_hogs                 | 15087           |
-|single                             | 13316 (88.26%)  |
-|duplicated                         | 1353 (8.97%)    |
-|duplicated_unexpected              | 1101 (7.30%)    |
-|duplicated_expected                | 252 (1.67%)     |
-|missing                            | 418 (2.77%)     |
-|num_proteins_in_proteome           | 36387           |
-|total_consistent                   | 30365 (83.45%)  |
-|consistent_partial_hits            | 1803 (4.96%)    |
-|consistent_fragmented              | 1625 (4.47%)    |
-|total_inconsistent                 | 2283 (6.27%)    |
-|inconsistent_partial_hits          | 517 (1.42%)     |
-|inconsistent_fragmented            | 1444 (3.97%)    |
-|total_contaminants                 | 0 (0.00%)       |
-|contaminants_partial_hits          | 0 (0.00%)       |
-|contaminants_fragmented            | 0 (0.00%)       |
-|total_unknown                      | 3739 (10.28%)   |
-
-|PSAURON                            | Value           |
--------------------------------------------------------
-|psauron_score                      | 83.8            |
-|true_count                         | 30494           |
-|false_count                        | 5893            |
-|median_score                       | 0.98278         |
-|max_score                          | 1.0             |
-|min_score                          | 0.00022         |
-
-
-|Best Reciprocal Hits               | Value           |
--------------------------------------------------------
-|num_best_reciprocal_hits           | 29185           |
-|num_splitting_genes_08             | 932 (3.19%)     |
-|num_splitting_genes_05             | 0 (0.0%)        |
-|num_fusion_genes_12                | 437 (1.5%)      |
-|num_fusion_genes_15                | 482 (1.65%)     |
-|KL_divergence_normalized           | 0.0105          |
-|JS_divergence_normalized           | 0.0023          |
-|Wasserstein_distance               | 2.480915        |
+|General Statistics                                       | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|num_genes                                                | 24442                                   |
+|mean_gene_length                                         | 10165.06                                |
+|median_gene_length                                       | 4233.5                                  |
+|num_transcripts                                          | 25416                                   |
+|mean_transcripts_per_gene                                | 1.48                                    |
+|median_transcripts_per_gene                              | 1.0                                     |
+|num_exons                                                | 313568                                  |
+|mean_exons_per_transcript                                | 11.55                                   |
+|median_exons_per_transcript                              | 8.0                                     |
+|mean_exons_per_multiexon_transcript                      | 12.08                                   |
+|median_exons_per_multiexon_transcript                    | 9.0                                     |
+|num_transcripts_without_introns                          | 1228 (4.83%)                            |
+|num_exon_3n                                              | 136217 (43.44%)                         |
+|num_exon_3n1                                             | 89437 (28.52%)                          |
+|num_exon_3n2                                             | 87914 (28.04%)                          |
+|mean_cds_length                                          | 2071.59                                 |
+|median_cds_length                                        | 1395.0                                  |
+|total_cds_length                                         | 52651413                                |
+|percentage_cds_coverage                                  | 14.85%                                  |
+|num_introns                                              | 279614                                  |
+|mean_intron_length                                       | 1394.05                                 |
+|median_intron_length                                     | 447.0                                   |
+|mean_introns_per_transcript                              | 10.55                                   |
+|median_introns_per_transcript                            | 7.0                                     |
+|short_intron_3n/short_intron                             | 6113 (35.58%)                           |
+|long_intron_3n/long_intron                               | 86931 (33.13%)                          |
+|stopless_short_intron_3n/stopless_short_intron           | 479 (25.77%)                            |
+|stopless_short_intron_3n1/stopless_short_intron          | 644 (34.64%)                            |
+|stopless_short_intron_3n2/stopless_short_intron          | 736 (39.59%)                            |
+|stop_containing_short_intron_3n/short_containing_intron  | 5634 (36.77%)                           |
+|stop_containing_short_intron_3n1/short_containing_intron | 4730 (30.87%)                           |
+|stop_containing_short_intron_3n2/short_containing_intron | 4960 (32.37%)                           |
 
 
-|RNASeq                             | Value           |
--------------------------------------------------------
-|mapping_rate                       | 96.27%          |
-|primary_mapping_rate               | 95.83%          |
-|properly_paired                    | 92.47%          |
-|num_gene_unsupported               | 9445 (25.95%)   |
-|num_exon_unsupported               | 20232 (13.51%)  |
-|num_intron_supported               | 107202          |
-|num_intron_supported_canonical     | 107131 (99.93%) |
-|num_intron_supported_non_canonical | 71 (0.07%)      |
+|BUSCO                                                    | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|lineage_dataset                                          | metazoa_odb12                           |
+|n_markers                                                | 672                                     |
+|BUSCO Assem                                              | C:98.4[S:98.1,D:0.3],F:0.9,M:0.7,E:26.0 |
+|BUSCO Annot                                              | C:99.3[S:74.0,D:25.3],F:0.6,M:0.1       |
+|Delta BUSCO                                              | 0.9%                                    |
+
+
+|OMARK                                                    | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|OMA_clade                                                | Eleutherozoa                            |
+|num_conserved_hogs                                       | 8933                                    |
+|single                                                   | 5266 (58.95%)                           |
+|duplicated                                               | 1867 (20.90%)                           |
+|duplicated_unexpected                                    | 1865 (20.88%)                           |
+|duplicated_expected                                      | 2 (0.02%)                               |
+|missing                                                  | 1800 (20.15%)                           |
+|num_proteins_in_proteome                                 | 25416                                   |
+|total_consistent                                         | 18127 (71.32%)                          |
+|consistent_partial_hits                                  | 4198 (16.52%)                           |
+|consistent_fragmented                                    | 667 (2.62%)                             |
+|total_inconsistent                                       | 3285 (12.92%)                           |
+|inconsistent_partial_hits                                | 1672 (6.58%)                            |
+|inconsistent_fragmented                                  | 177 (0.70%)                             |
+|total_contaminants                                       | 0 (0.00%)                               |
+|contaminants_partial_hits                                | 0 (0.00%)                               |
+|contaminants_fragmented                                  | 0 (0.00%)                               |
+|total_unknown                                            | 4004 (15.75%)                           |
+
+
+|PSAURON                                                  | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|psauron_score                                            | 99.4                                    |
+|true_count                                               | 25270                                   |
+|false_count                                              | 146                                     |
+|median_score                                             | 0.99642                                 |
+|max_score                                                | 1.0                                     |
+|min_score                                                | 0.00168                                 |
+
+
+|Best Reciprocal Hits                                     | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|num_best_reciprocal_hits                                 | 18057                                   |
+|num_split_gene_length_<0.75x                             | 11 (0.06%)                              |
+|num_fusion_gene_length_>1.25x                            | 0 (0.0%)                                |
+|KL_divergence_normalized                                 | 0.0001                                  |
+|JS_divergence_normalized                                 | 0.0                                     |
+|Wasserstein_distance                                     | 0.255469                                |
+
+
+|RNASeq                                                   | Value                                   |
+-----------------------------------------------------------------------------------------------------
+|mapping_rate                                             | 82.6%                                   |
+|primary_mapping_rate                                     | 81.52%                                  |
+|properly_paired                                          | 76.99%                                  |
+|num_gene_supported                                       | 18387 (83.37%)                          |
+|num_exon_supported                                       | 287195 (91.59%)                         |
+|num_exact_intron_boundary                                | 0 (0.0%)                                |
+|num_intron_supported_canonical                           | 0 (0.00%)                               |
+|num_intron_supported_non_canonical                       | 0 (0.00%)                               |
 ```
 
-## Performance of the workflow on assessing annotation
+## Comparing the output from multiple runs
 
-To be added
+In order to compare the output from multiple runs, either of the same species or from different species, we provide a script in the bin directory for a comprehensive view of the results. Just have to gather all the JSON outputs of AnnoAudit in the same folder, then run the script directly.
+
+```
+python bin/compare_audit.py
+```
+
+Here is an example output of the script
+
+![Comprehensive Comparison](./assets/images/annotation_comprehensive_comparison.png)
 
 ## Future work
 
-- Adding other plots for easier evaluation
-- Perform comparative performance with different genomes
